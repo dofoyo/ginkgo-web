@@ -41,9 +41,9 @@ export default {
       var vm = this;
       resource.get()
               .then((response) => {
-                vm.$set(this.board,'boardid',response.data.bordid);
-                vm.$set(this.board,'boardname',response.data.boardname);
-                vm.$set(this.board,'stages',response.data.stages);
+                vm.$set(this.board,'boardid',response.data.content.bordid);
+                vm.$set(this.board,'boardname',response.data.content.boardname);
+                vm.$set(this.board,'stages',response.data.content.stages);
               })
               .catch(function(response) {
                 console.log("there are something wrong!!!");
