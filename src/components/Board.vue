@@ -2,19 +2,14 @@
   <div class="container-fluid">
     <div class="panel panel-default">
       <div class="panel-heading">
-        <table width="100%">
-          <tr>
-            <td><h3 class="panel-title">{{board.boardname}}</h3></td>
-            <td align="right"><button >Create</button></td>
-          </tr>
-        </table>
+         <h3 class="panel-title">{{board.boardname}}</h3>
       </div>
       <div class="panel-body">
         <div class="col-md-2" v-for="stage in board.stages">
           <p>{{stage.stagename}}</p>
-          <draggable element="ul" class="list-group" v-model="stage.tasks" :id="stage.stageid" :options="{group:'tasks'}" @add="addDrag" @end="endDrag"> 
-                <li class="list-group-item" v-for="task in stage.tasks"> 
-                    {{task.taskname}}<br>{{task.description}}
+          <draggable element="ul" class="list-group" v-model="stage.projects" :id="stage.stageid" :options="{group:'projects'}" @add="addDrag" @end="endDrag"> 
+                <li class="list-group-item" v-for="project in stage.projects"> 
+                    {{project.projectname}}<br>{{project.description}}
                 </li> 
           </draggable>
         </div>
@@ -27,7 +22,7 @@
 import draggable from "vuedraggable";
 
 export default {
-  name: "hello",
+  name: "board",
   components: {
     draggable
   },
@@ -36,6 +31,7 @@ export default {
       board:{}
     }
   },
+  props: ['isshowprojectview'],
   mounted: function() {
       this.getData();
   },
@@ -55,11 +51,11 @@ export default {
                 console.log(response);
               })
     },
-    updateData:function(stageid,tasks){
+    updateData:function(stageid,projects){
       var apiurl = 'http://localhost:8081/stage'
       var resource = this.$resource(apiurl);
       var vm = this;
-      resource.update({id:stageid},tasks)
+      resource.update({id:stageid},projects)
               .then((respones) =>{ 
                   console.log(response);
                 })
@@ -72,7 +68,7 @@ export default {
       var stageid = evt.to.id;
       for(var i=0; i<this.board.stages.length; i++){
         if(this.board.stages[i].stageid == stageid){
-            this.updateData(stageid,this.board.stages[i].tasks);
+            this.updateData(stageid,this.board.stages[i].projects);
             break;
         }
       }
@@ -81,7 +77,7 @@ export default {
       var stageid = evt.from.id;
       for(var i=0; i<this.board.stages.length; i++){
         if(this.board.stages[i].stageid == stageid){
-            this.updateData(stageid,this.board.stages[i].tasks);
+            this.updateData(stageid,this.board.stages[i].projects);
             break;
         }
       }

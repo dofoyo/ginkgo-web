@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <hello></hello>
+    <board></board>
+    <projectview></projectview>
     <div class="logo">
        <img src="./assets/logo.png">
     </div> 
@@ -8,12 +9,19 @@
 </template>
 
 <script>
-import Hello from './components/Hello'
+import board from './components/Board'
+import projectview from './components/Projectview'
 
 export default {
   name: 'app',
   components: {
-    Hello
+    board,
+    projectview
+  },
+  data () {
+    return {
+      
+    }
   }
 }
 </script>
