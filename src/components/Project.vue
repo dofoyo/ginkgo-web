@@ -6,10 +6,10 @@
          <table width="100%">
            <tr>
              <td>
-                <h2 class="panel-title"  @click="isShow=!isShow">{{projectname}}</h2>
+                <h2 class="panel-title">{{projectname}}</h2>
              </td>
              <td>
-                <small @click="isShow=!isShow">显示参与人</small>
+                <small @click="showPerson=!showPerson">显示参与人</small>
              </td>
 
              <td width="300px" align="right">
@@ -29,17 +29,17 @@
           <div class="panel panel-info">
             <div class="panel-heading">
               <h5 class="panel-title">
-                {{task.subject}}
+                <span>{{task.subject}}</span>
+                &nbsp&nbsp&nbsp&nbsp&nbsp<span @click="removeTask(task.taskid)"> X </span>
               </h5>
-
-              <div v-show="isShow" >
+              <div v-show="showPerson">
                 <div>
                   执行人：
-                  <span v-for="actor in task.actors">{{actor}},</span>
+                  <span v-for="actor in task.actors">{{actor}}, </span>
                 </div>
                 <div>
                   知会人：
-                  <span v-for="other in task.others">{{other}},</span>
+                  <span v-for="other in task.others">{{other}}, </span>
                 </div>
               </div>
 
@@ -70,7 +70,7 @@ export default {
       description:'',
       tasks:[],
       taskid:'',
-      isShow:false
+      showPerson:false
     }
   },
   watch:{
@@ -99,7 +99,7 @@ export default {
       var apiurl = 'http://localhost:8081/task'
       var resource = this.$resource(apiurl);
       var vm = this;
-      var projectid_taskid = vm.projectid + "," + vm.taskid;
+      var projectid_taskid = vm.showid + "," + vm.taskid;
       var ptid = {"ptid":projectid_taskid}
       //console.log(projectid_taskid);
       resource.update({id:projectid_taskid},ptid)
@@ -113,6 +113,28 @@ export default {
                 this.getData(this.showid); 
               });
       this.taskid = "";      
+    },
+    removeTask:function(taskid){
+      var isremove = confirm("Are you sure?");
+      if(isremove){
+        var apiurl = 'http://localhost:8081/task'
+        var resource = this.$resource(apiurl);
+        var vm = this;
+        var projectid_taskid = vm.showid + "," + taskid;
+        var ptid = {"ptid":projectid_taskid}
+        console.log(projectid_taskid);
+        resource.remove({id:projectid_taskid},ptid)
+                .then((respones) =>{ 
+                    console.log(response);
+                    this.getData(this.showid); 
+                  })
+                .catch(function(response){
+                  console.log("removeTask Error !!!");
+                  console.log(response);
+                  this.getData(this.showid); 
+                });        
+      }
+
     }
 
   }
