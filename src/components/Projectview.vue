@@ -60,8 +60,6 @@ export default {
       this.description = "";
 
       history.go(0);
-
-      
     }
   }
 }

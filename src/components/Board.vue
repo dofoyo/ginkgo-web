@@ -1,14 +1,28 @@
 <template>
   <div class="container-fluid">
-    <div class="panel panel-default">
+    <div class="panel panel-primary">
       <div class="panel-heading">
-         <h3 class="panel-title">{{board.boardname}}</h3>
+         <table width="100%">
+           <tr>
+             <td>
+                <h2 class="panel-title">{{board.boardname}}</h2>
+             </td>
+             <td width="300px" align="right">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="输入项目名" aria-describedby="basic-addon2" v-model="projectname">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" @click="createProject">创建项目</button>
+                  </span>
+                </div>
+             </td>
+           </tr>
+         </table>
       </div>
       <div class="panel-body">
         <div class="col-md-2" v-for="stage in board.stages">
           <p>{{stage.stagename}}</p>
           <draggable element="ul" class="list-group" v-model="stage.projects" :id="stage.stageid" :options="{group:'projects'}" @add="addDrag" @end="endDrag"> 
-                <li class="list-group-item" v-for="project in stage.projects"> 
+                <li class="list-group-item" v-for="project in stage.projects" @click='selectProject($event)' :id="project.projectid"> 
                     {{project.projectname}}<br>{{project.description}}
                 </li> 
           </draggable>
@@ -28,10 +42,10 @@ export default {
   },
   data () {
     return {
-      board:{}
+      board:{},
+      projectname:''
     }
   },
-  props: ['isshowprojectview'],
   mounted: function() {
       this.getData();
   },
@@ -42,6 +56,7 @@ export default {
       var vm = this;
       resource.get()
               .then((response) => {
+                console.log(response.data.content.stages);
                 vm.$set(this.board,'boardid',response.data.content.bordid);
                 vm.$set(this.board,'boardname',response.data.content.boardname);
                 vm.$set(this.board,'stages',response.data.content.stages);
@@ -69,6 +84,8 @@ export default {
       for(var i=0; i<this.board.stages.length; i++){
         if(this.board.stages[i].stageid == stageid){
             this.updateData(stageid,this.board.stages[i].projects);
+            //console.log(stageid +':'+ JSON.stringify(this.board.stages[i].projects));
+            //console.log(evt);
             break;
         }
       }
@@ -78,9 +95,36 @@ export default {
       for(var i=0; i<this.board.stages.length; i++){
         if(this.board.stages[i].stageid == stageid){
             this.updateData(stageid,this.board.stages[i].projects);
+            console.log(stageid +':'+ JSON.stringify(this.board.stages[i].projects));
+            console.log(evt);
             break;
         }
       }
+    },
+    createProject:function(){
+      var apiurl = 'http://localhost:8081/project'
+      var resource = this.$resource(apiurl);
+      var vm = this;
+      var project = {projectname:vm.projectname};
+      //console.log(project);
+      resource.update({id:''},project)
+              .then((respones) =>{ 
+                  console.log(response);
+                   this.getData();
+                })
+              .catch(function(response){
+                console.log("there are something wrong!!!");
+                console.log(response);
+                 this.getData();
+              });
+      this.projectname = "";
+      
+    },
+    selectProject:function(e){
+      //console.log(e);
+      //console.log(e.target.id);
+      this.$emit('selectedProjectid',e.target.id);
+
     }
   }
 }

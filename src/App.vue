@@ -1,27 +1,37 @@
 <template>
   <div id="app">
-    <board></board>
-    <projectview></projectview>
+    <board v-on:selectedProjectid='showNewProject'></board>
+    <project :showid='showid'></project>
     <div class="logo">
        <img src="./assets/logo.png">
     </div> 
+    <div>
+        项目ID:{{showid}}
+        <p></p>
+    </div>
   </div>
 </template>
 
 <script>
 import board from './components/Board'
-import projectview from './components/Projectview'
+import project from './components/Project'
 
 export default {
   name: 'app',
   components: {
     board,
-    projectview
+    project
   },
   data () {
     return {
-      
+      showid:''
     }
+  },
+  methods:{
+    showNewProject:function(id){
+      this.showid = id;
+    }
+
   }
 }
 </script>
