@@ -22,8 +22,17 @@
         <div class="col-md-2" v-for="stage in board.stages">
           <p>{{stage.stagename}}</p>
           <draggable element="ul" class="list-group" v-model="stage.projects" :id="stage.stageid" :options="{group:'projects'}" @add="addDrag" @end="endDrag"> 
-                <li class="list-group-item" v-for="project in stage.projects" @click='selectProject($event)' :id="project.projectid"> 
-                    {{project.projectname}}<br>{{project.description}}
+                <li class="list-group-item" v-for="project in stage.projects" :id="project.projectid"> 
+                    <table width="100%">
+                      <tr>
+                        <td>
+                          <span @click='selectProject(project.projectid)'>{{project.projectname}}</span>
+                        </td>
+                        <td align="right">
+                          <span @click="removeProject(project.projectid)"> X </span>                 
+                        </td>
+                      </tr>
+                    </table>
                 </li> 
           </draggable>
         </div>
@@ -120,11 +129,28 @@ export default {
       this.projectname = "";
       
     },
-    selectProject:function(e){
-      //console.log(e);
-      //console.log(e.target.id);
-      this.$emit('selectedProjectid',e.target.id);
+    selectProject:function(projectid){
+      this.$emit('selectedProjectid',projectid);
 
+    },
+    removeProject:function(projectid){
+      var isremove = confirm("Are you sure?");
+      if(isremove){
+        var apiurl = 'http://localhost:8081/project'
+        var resource = this.$resource(apiurl);
+        var vm = this;
+        var ptid = {"ptid":projectid}
+        resource.remove({id:projectid},ptid)
+                .then((respones) =>{ 
+                    console.log(response);
+                    this.getData(); 
+                  })
+                .catch(function(response){
+                  console.log("remove project Error !!!");
+                  console.log(response);
+                  this.getData(); 
+                });   
+      }
     }
   }
 }
