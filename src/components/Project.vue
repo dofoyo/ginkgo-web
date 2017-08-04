@@ -28,10 +28,23 @@
         <div class="col-sm-5 col-md-3" v-for="task in tasks">
           <div class="panel panel-info">
             <div class="panel-heading">
-              <h5 class="panel-title">
-                <span>{{task.subject}}</span>
-                &nbsp&nbsp&nbsp&nbsp&nbsp<span @click="removeTask(task.taskid)"> X </span>
-              </h5>
+              <table width="100%">
+                <tr>
+                  <td>
+                    <span @click="collapseTaskdetail(task.taskid)">V&nbsp</span>
+                  </td>
+                  <td>
+                    <h5 class="panel-title">
+                        <span>{{task.subject}}</span>
+                    </h5>
+                  </td>
+
+                  <td>
+                        <span @click="removeTask(task.taskid)"> X </span>                    
+                  </td>
+                </tr>
+              </table>
+              
               <div v-show="showPerson">
                 <div>
                   执行人：
@@ -44,13 +57,11 @@
               </div>
 
             </div>
-            <div class="panel-body">
+            <div class="panel-body" :id='task.taskid'>
               <li v-for="taskDetail in task.taskDetail">
                 <strong>{{taskDetail.person}}</strong>&nbsp&nbsp<small>{{taskDetail.dateAndTime}}</small>
                 <div v-html='taskDetail.done'></div><br>
               </li>
-              
-
             </div>
           </div>
         </div>
@@ -114,6 +125,14 @@ export default {
               });
       this.taskid = "";      
     },
+    collapseTaskdetail:function(taskid){
+         var t = document.getElementById(taskid);
+         if(t.style.display == "none"){
+            t.style.display = "block";
+         }else{
+            t.style.display = "none";
+         }
+    },
     removeTask:function(taskid){
       var isremove = confirm("Are you sure?");
       if(isremove){
@@ -134,9 +153,7 @@ export default {
                   this.getData(this.showid); 
                 });        
       }
-
     }
-
   }
 }
 </script>
