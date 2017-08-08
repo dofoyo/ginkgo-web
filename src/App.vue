@@ -5,10 +5,6 @@
     <div class="logo">
        <img src="./assets/logo.png">
     </div> 
-    <div>
-        项目ID:{{showid}}
-        <p></p>
-    </div>
   </div>
 </template>
 

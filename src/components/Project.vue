@@ -2,30 +2,30 @@
   <div class="container-fluid">
     <div class="panel panel-primary">
       <div class="panel-heading">
-
          <table width="100%">
            <tr>
              <td>
-                <h2 class="panel-title">{{projectname}}</h2>
+                <h2 class="panel-title">{{projectname}}:</h2>
              </td>
              <td>
-                <small @click="showPerson=!showPerson">显示参与人</small>
+              <input type="text" class="form-control" v-model="showid" readonly="true">
              </td>
-
-             <td width="300px" align="right">
-                <div class="input-group">
-                  <input type="text" class="form-control" placeholder="输入任务编号" aria-describedby="basic-addon2" v-model="taskid">
-                  <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" @click="addTask">加入任务</button>
-                  </span>
-                </div>
+              <td width="10%" align="center"> 
+                <small @click="refreshProjectAndTask">刷新</small>
+             </td>              
+             <td width="30%" align="center">
+                <small v-show="loading">读取中....</small>
+                <small v-show="refreshing">刷新中....</small>
+             </td>
+             <td aligh="right">
+                <small @click="showPerson=!showPerson">显示参与人</small>
              </td>
            </tr>
          </table>
       </div>
       <p></p>
       <div class="row">
-        <div class="col-sm-5 col-md-3" v-for="task in tasks">
+        <div class="col-md-2" v-for="task in tasks">
           <div class="panel panel-info">
             <div class="panel-heading">
               <table width="100%">
@@ -37,10 +37,6 @@
                     <h5 class="panel-title">
                         <span>{{task.subject}}</span>
                     </h5>
-                  </td>
-
-                  <td>
-                        <span @click="removeTask(task.taskid)"> X </span>                    
                   </td>
                 </tr>
               </table>
@@ -81,7 +77,9 @@ export default {
       description:'',
       tasks:[],
       taskid:'',
-      showPerson:false
+      showPerson:false,
+      loading:false,
+      refreshing:false
     }
   },
   watch:{
@@ -91,7 +89,11 @@ export default {
   },
   methods:{
     getData:function(showid){
-      var apiurl = 'http://localhost:8081/projects';
+      var root = process.env.API_ROOT;
+      this.loading = true;
+      var apiurl = root + 'project';
+      console.log("apiurl");
+      console.log(apiurl);
       var resource = this.$resource(apiurl)
       var vm = this;
       resource.get({id:showid})
@@ -100,30 +102,13 @@ export default {
                 this.projectname = response.data.content.projectname;
                 this.description = response.data.content.description;
                 this.tasks = response.data.content.tasks;
+                this.loading = false;
               })
               .catch(function(response) {
                 console.log("there are something wrong!!!");
                 console.log(response);
+                this.loading = false;
               })
-    },
-    addTask:function(){
-      var apiurl = 'http://localhost:8081/task'
-      var resource = this.$resource(apiurl);
-      var vm = this;
-      var projectid_taskid = vm.showid + "," + vm.taskid;
-      var ptid = {"ptid":projectid_taskid}
-      //console.log(projectid_taskid);
-      resource.update({id:projectid_taskid},ptid)
-              .then((respones) =>{ 
-                  console.log(response);
-                  this.getData(this.showid); 
-                })
-              .catch(function(response){
-                console.log("addTask Error !!!");
-                console.log(response);
-                this.getData(this.showid); 
-              });
-      this.taskid = "";      
     },
     collapseTaskdetail:function(taskid){
          var t = document.getElementById(taskid);
@@ -133,26 +118,25 @@ export default {
             t.style.display = "none";
          }
     },
-    removeTask:function(taskid){
-      var isremove = confirm("Are you sure?");
-      if(isremove){
-        var apiurl = 'http://localhost:8081/task'
-        var resource = this.$resource(apiurl);
-        var vm = this;
-        var projectid_taskid = vm.showid + "," + taskid;
-        var ptid = {"ptid":projectid_taskid}
-        console.log(projectid_taskid);
-        resource.remove({id:projectid_taskid},ptid)
-                .then((respones) =>{ 
-                    console.log(response);
-                    this.getData(this.showid); 
-                  })
-                .catch(function(response){
-                  console.log("removeTask Error !!!");
-                  console.log(response);
-                  this.getData(this.showid); 
-                });        
-      }
+    refreshProjectAndTask:function(){
+      var root = process.env.API_ROOT;
+      this.refreshing = true;
+      var apiurl = root + 'refreshProjectAndTask';
+      var resource = this.$resource(apiurl)
+      var vm = this;
+      resource.get({id:vm.showid})
+              .then((response) => {
+                this.projectid = response.data.content.projectid;
+                this.projectname = response.data.content.projectname;
+                this.description = response.data.content.description;
+                this.tasks = response.data.content.tasks;
+                this.refreshing = false;
+              })
+              .catch(function(response) {
+                console.log("there are something wrong!!!");
+                console.log(response);
+                this.refreshing = false;
+              })
     }
   }
 }
