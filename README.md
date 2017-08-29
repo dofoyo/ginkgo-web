@@ -13,4 +13,5 @@ npm run dev
 npm run build
 
 
-
+# xcopy d:\workspace\ginkgo-web\dist\*.* d:\workspace\ginkgo\src\main\webapp\ /e
+deploy
